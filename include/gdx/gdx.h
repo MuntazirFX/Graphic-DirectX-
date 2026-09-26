@@ -10,3 +10,4 @@
 #include "gdx/Xpk.h"
 #include "gdx/Game.h"
 #include "gdx/Title.h"
+#include "gdx/Credits.h"
