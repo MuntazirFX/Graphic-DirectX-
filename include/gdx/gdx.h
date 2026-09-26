@@ -11,3 +11,4 @@
 #include "gdx/Game.h"
 #include "gdx/Title.h"
 #include "gdx/Credits.h"
+#include "gdx/D3D8.h"

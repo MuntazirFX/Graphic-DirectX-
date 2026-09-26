@@ -1,13 +1,6 @@
 # Graphic-DirectX-
 
-Joymania family toolkit — same XPK / .x / .dat pipeline for:
+Joymania / SCIT 2002 toolkit. Not d3d8.dll. Not a decompile.
 
-| Id | Game | Archive | Exe |
-|---|---|---|---|
-| scit | Santa Claus in Trouble (2002) | `xmas.xpk` | SantaClausInTrouble.exe |
-| scit-again | ... again! (2004) | `xmas.xpk` | SantaClaus2.exe |
-| rosso | Rosso Rabbit in Trouble (2003) | `bb.xpk` | RossoRabbitInTrouble.exe |
-| scit-hd | HD (2020) | `data.pak` (not XPK) | SantaClausInTrouble.exe |
-
-Detect: `gdx::detectTitle(archive, path)`.
-HD pak format is separate (jeysym scit-hd-pak-tool) — flagged, not parsed as XPK.
+`gdx/D3D8.h` = portable FVF POS+NORMAL+UV pack + world/proj helpers.
+Bind `DrawItem.v / DrawItem.i` to a Metal buffer on iOS (`Santa-ios` shaders).
