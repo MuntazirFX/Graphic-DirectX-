@@ -15,7 +15,7 @@ struct Tok {
 
     void skip() {
         for (;;) {
-            while (p < end && std::isspace(static_cast<unsigned char>(*p))) ++p;
+            while (p < end && (std::isspace(static_cast<unsigned char>(*p)) || *p == ';' || *p == ',')) ++p;
             if (p + 1 < end && p[0] == '/' && p[1] == '/') {
                 while (p < end && *p != '\n') ++p;
                 continue;
@@ -84,8 +84,6 @@ struct Tok {
         v = std::strtof(p, &next);
         if (next == p) return false;
         p = next;
-        consume(';');
-        consume(',');
         return true;
     }
 
@@ -146,7 +144,6 @@ bool parseMaterialBody(Tok& t, Material& mat) {
         if (t.matchIdent("TextureFilename")) {
             t.consume('{');
             mat.texture = t.quoted();
-            t.consume(';');
             t.consume('}');
         } else if (t.consume('{')) {
             int depth = 1;
