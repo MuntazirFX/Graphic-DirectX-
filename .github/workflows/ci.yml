@@ -11,13 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-      - name: Build
-        run: cmake --build build --config Release
-      - name: Dump sample
-        run: ./build/xdump samples/cube.x
-      - name: Raster cube
-        run: ./build/d3d8dump samples/cube.x cube.ppm
-      - name: Unit tests
-        run: ./build/gdx_tests
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build --config Release
+      - run: ./build/gdxhost -model samples/cube.x -o cube.ppm
+      - run: ./build/gdx_tests

@@ -13,17 +13,17 @@ add_library(gdx STATIC
     src/Game.cpp
     src/Title.cpp
     src/D3D8Device.cpp
+    src/Host.cpp
 )
 target_include_directories(gdx PUBLIC include)
 
-add_executable(xdump src/xdump.cpp)
-target_link_libraries(xdump PRIVATE gdx)
-add_executable(datdump src/datdump.cpp)
-target_link_libraries(datdump PRIVATE gdx)
-add_executable(xpkdump src/xpkdump.cpp)
-target_link_libraries(xpkdump PRIVATE gdx)
-add_executable(d3d8dump src/d3d8dump.cpp)
-target_link_libraries(d3d8dump PRIVATE gdx)
+foreach(bin IN ITEMS xdump datdump xpkdump d3d8dump)
+    add_executable(${bin} src/${bin}.cpp)
+    target_link_libraries(${bin} PRIVATE gdx)
+endforeach()
+
+add_executable(gdxhost src/gdxhost.cpp)
+target_link_libraries(gdxhost PRIVATE gdx)
 
 add_executable(gdx_tests tests/test_main.cpp)
 target_link_libraries(gdx_tests PRIVATE gdx)

@@ -1,6 +1,18 @@
-# Graphic-DirectX-
+# Graphic-DirectX- / gdxhost
 
-Joymania / SCIT 2002 toolkit. Not d3d8.dll. Not a decompile.
+Xash3D-**style** split for Joymania data. Not a GoldSrc fork. Not Xash code.
 
-`gdx/D3D8.h` = portable FVF POS+NORMAL+UV pack + world/proj helpers.
-Bind `DrawItem.v / DrawItem.i` to a Metal buffer on iOS (`Santa-ios` shaders).
+| Xash3D | Here |
+|---|---|
+| `filesystem` PAK/WAD | `Xpk` (`xmas.xpk`, `bb.xpk`) |
+| `model` MDL | `.x` parser |
+| `world` BSP | `.dat` + elements.txt |
+| `ref_soft` | `Device8` software raster |
+| `client.dll` | `GameSession` |
+| `xash` launcher | `gdxhost` |
+
+```bash
+cmake -S . -B build && cmake --build build
+./build/gdxhost -model samples/cube.x -o cube.ppm
+./build/gdxhost -pak xmas.xpk -map levels\\000.dat -model gfx\\something.x
+```
