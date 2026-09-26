@@ -1,21 +1,15 @@
 # Graphic-DirectX-
 
-Joymania / Santa Claus in Trouble 2002 asset toolkit.
-
+Joymania / Santa Claus in Trouble 2002 asset + rules toolkit.
 https://github.com/MuntazirFX/Graphic-DirectX-
 
 ## Done
 
-- DirectX `.x` text + binary
-- Level `.dat` (60-byte records)
-- `elements.txt` catalog
-- **XPK** (`xmas.xpk`): count, name table, sizes, timestamps, absolute data offsets
-- DDS header, skin pack
-- `xdump` `datdump` `xpkdump` + CI
+- `.x` meshes, `.dat` levels, XPK, elements catalog
+- **Game session** (not a decompile of SantaClausInTrouble.exe):
+  - classify actors from catalog TYPE
+  - present pickup, extra life at 100%
+  - exit score = presents×10 + seconds left×2 (PC reference)
+  - timer does not auto-fail (same as 2002)
 
-SCIT 2002 `xmas.xpk` stores file bytes raw (no per-file MSZip). Name "MSZip" is the family label; this reader matches the on-disk layout verified in `Santa-ios` / XPKTool.
-
-```bash
-./build/xpkdump xmas.xpk
-./build/xpkdump xmas.xpk levels\\000.dat
-```
+Original Windows EXE is unused. Logic reads the same data files the EXE used.

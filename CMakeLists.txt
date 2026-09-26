@@ -10,15 +10,14 @@ add_library(gdx STATIC
     src/DatLevel.cpp
     src/ElementCatalog.cpp
     src/Xpk.cpp
+    src/Game.cpp
 )
 target_include_directories(gdx PUBLIC include)
 
 add_executable(xdump src/xdump.cpp)
 target_link_libraries(xdump PRIVATE gdx)
-
 add_executable(datdump src/datdump.cpp)
 target_link_libraries(datdump PRIVATE gdx)
-
 add_executable(xpkdump src/xpkdump.cpp)
 target_link_libraries(xpkdump PRIVATE gdx)
 
