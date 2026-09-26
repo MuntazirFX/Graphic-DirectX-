@@ -1,4 +1,5 @@
 #include "gdx/Host.h"
+#include "gdx/EngineName.h"
 #include <sstream>
 
 namespace gdx {
@@ -10,7 +11,7 @@ void Host::print(const std::string& line) {
 
 bool Host::boot(const HostConfig& cfg) {
     log.clear();
-    print("gdxhost v1 (Xash-style module split, not GoldSrc)");
+    print(kEngineTag);
     print(std::string("credits: ") + kProgrammers);
 
     if (!cfg.archive.empty()) {

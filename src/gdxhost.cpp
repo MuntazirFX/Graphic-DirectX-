@@ -1,4 +1,5 @@
 #include "gdx/Host.h"
+#include "gdx/EngineName.h"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -10,6 +11,10 @@ int main(int argc, char** argv) {
         else if (a == "-map" && i + 1 < argc) cfg.levelDat = argv[++i];
         else if (a == "-model" && i + 1 < argc) cfg.meshX = argv[++i];
         else if (a == "-o" && i + 1 < argc) cfg.ppmOut = argv[++i];
+        else if (a == "-version") {
+            std::cout << gdx::kEngineTag << "\n";
+            return 0;
+        }
     }
     gdx::Host host;
     if (!host.boot(cfg)) {

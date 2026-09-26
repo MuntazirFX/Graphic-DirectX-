@@ -1,18 +1,14 @@
-# Graphic-DirectX- / gdxhost
+# TroubleEngine
 
-Xash3D-**style** split for Joymania data. Not a GoldSrc fork. Not Xash code.
+Engine name: **TroubleEngine**  
+Repo folder: Graphic-DirectX-  
+Binary: `gdxhost`
 
-| Xash3D | Here |
-|---|---|
-| `filesystem` PAK/WAD | `Xpk` (`xmas.xpk`, `bb.xpk`) |
-| `model` MDL | `.x` parser |
-| `world` BSP | `.dat` + elements.txt |
-| `ref_soft` | `Device8` software raster |
-| `client.dll` | `GameSession` |
-| `xash` launcher | `gdxhost` |
+Joymania *In Trouble* family (Santa 2002 / Again / Rosso).  
+Not Xash3D. Not GoldSrc. Not AetherEngine.
 
 ```bash
-cmake -S . -B build && cmake --build build
+./build/gdxhost -version
 ./build/gdxhost -model samples/cube.x -o cube.ppm
-./build/gdxhost -pak xmas.xpk -map levels\\000.dat -model gfx\\something.x
+./build/gdxhost -pak xmas.xpk -map levels\\000.dat
 ```
