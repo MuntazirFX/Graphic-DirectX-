@@ -1,0 +1,17 @@
+ELEMENT   "TREE A"
+FILE      "gfx\\tree_a.x"
+RADIUS    1.2
+SCALING   1.0
+TYPE      DECO
+
+ELEMENT   "PRESENT A"
+FILE      "gfx\\present.x"
+RADIUS    0.4
+SCALING   1.0
+TYPE      BONUS
+
+ELEMENT   "Plattform EXIT"
+FILE      "gfx\\exit.x"
+RADIUS    1.5
+SCALING   1.0
+TYPE      EXIT
