@@ -11,6 +11,7 @@ add_library(gdx STATIC
     src/ElementCatalog.cpp
     src/Xpk.cpp
     src/Game.cpp
+    src/Title.cpp
 )
 target_include_directories(gdx PUBLIC include)
 

@@ -9,3 +9,4 @@
 #include "gdx/ElementCatalog.h"
 #include "gdx/Xpk.h"
 #include "gdx/Game.h"
+#include "gdx/Title.h"

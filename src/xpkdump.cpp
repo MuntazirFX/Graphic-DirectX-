@@ -1,4 +1,4 @@
-#include "gdx/Xpk.h"
+#include "gdx/gdx.h"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -11,6 +11,8 @@ int main(int argc, char** argv) {
         std::cerr << "error: " << a.error << "\n";
         return 2;
     }
+    auto t = gdx::titleInfo(gdx::detectTitle(a, argv[1]));
+    std::cout << "title: " << t.fullName << " (" << t.shortName << ")\n";
     std::cout << "files: " << a.count << " dataStart=" << a.dataStart << "\n";
     if (argc >= 3) {
         auto bytes = a.extract(argv[2]);
@@ -22,6 +24,6 @@ int main(int argc, char** argv) {
         return 0;
     }
     for (const auto& f : a.files)
-        std::cout << "  " << f.name << " size=" << f.size << " off=" << f.offset << "\n";
+        std::cout << "  " << f.name << " size=" << f.size << "\n";
     return 0;
 }

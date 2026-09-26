@@ -1,15 +1,13 @@
 # Graphic-DirectX-
 
-Joymania / Santa Claus in Trouble 2002 asset + rules toolkit.
-https://github.com/MuntazirFX/Graphic-DirectX-
+Joymania family toolkit — same XPK / .x / .dat pipeline for:
 
-## Done
+| Id | Game | Archive | Exe |
+|---|---|---|---|
+| scit | Santa Claus in Trouble (2002) | `xmas.xpk` | SantaClausInTrouble.exe |
+| scit-again | ... again! (2004) | `xmas.xpk` | SantaClaus2.exe |
+| rosso | Rosso Rabbit in Trouble (2003) | `bb.xpk` | RossoRabbitInTrouble.exe |
+| scit-hd | HD (2020) | `data.pak` (not XPK) | SantaClausInTrouble.exe |
 
-- `.x` meshes, `.dat` levels, XPK, elements catalog
-- **Game session** (not a decompile of SantaClausInTrouble.exe):
-  - classify actors from catalog TYPE
-  - present pickup, extra life at 100%
-  - exit score = presents×10 + seconds left×2 (PC reference)
-  - timer does not auto-fail (same as 2002)
-
-Original Windows EXE is unused. Logic reads the same data files the EXE used.
+Detect: `gdx::detectTitle(archive, path)`.
+HD pak format is separate (jeysym scit-hd-pak-tool) — flagged, not parsed as XPK.
