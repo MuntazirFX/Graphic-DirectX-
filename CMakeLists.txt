@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(gdx STATIC
     src/XParser.cpp
+    src/XBinary.cpp
 )
 target_include_directories(gdx PUBLIC include)
 

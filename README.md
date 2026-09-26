@@ -1,39 +1,29 @@
 # Graphic-DirectX-
 
 Portable **DirectX `.x`** loader (no D3DX, no Windows SDK).
-Meant for the Santa Claus in Trouble 2002 iOS remake: parse original mesh / frame / skin files extracted from XPK.
+For Santa Claus in Trouble 2002 iOS remake: parse original mesh / frame / skin files from XPK.
+
+Repo: https://github.com/MuntazirFX/Graphic-DirectX-
 
 ## Status
 
 - Text `.x` (`xof 0302txt` / `0303txt`)
+- Binary `.x` (`xof 0302bin` / `0303bin`, 32- or 64-bit floats)
 - `Mesh`, `MeshNormals`, `MeshTextureCoords`, `MeshMaterialList`, `Material`, `TextureFilename`
-- `Frame` + `FrameTransformMatrix` hierarchy
+- `Frame` + `FrameTransformMatrix`
 - `XSkinMeshHeader` + `SkinWeights`
-- n-gon faces fan-triangulated
-- Optional D3D → Metal axis convert (`z = -z`, flip winding)
-- Binary `.x` detected, not parsed yet
+- n-gon fan triangulation
+- Optional D3D → Metal (`ConvertOptions::metalFromD3D()`)
+
+Animation keys still skipped.
 
 ## Build
 
 ```bash
 cmake -S . -B build
 cmake --build build
-./build/xdump path/to/model.x
+./build/xdump samples/cube.x
+./build/xdump path/to/extracted.x
 ```
 
-## Use from Santa-iOS-Engine
-
-Add `include/` to header search path and compile `src/XParser.cpp`.
-
-```cpp
-#include "gdx/XParser.h"
-
-gdx::Document doc;
-std::string err;
-if (!gdx::parseFile("santa.x", doc, err, gdx::ConvertOptions::metalFromD3D())) {
-    // err
-}
-const gdx::Mesh* m = doc.firstMesh();
-```
-
-Do not author new `.x` files. Load the originals.
+`xdump` prints verts / tris / bones / textures. Use that on a real SCIT model next.

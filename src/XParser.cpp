@@ -1,4 +1,5 @@
 #include "gdx/XParser.h"
+#include "gdx/XBinary.h"
 
 #include <cctype>
 #include <cmath>
@@ -95,22 +96,6 @@ struct Tok {
         return true;
     }
 
-    void skipValue() {
-        skip();
-        int depth = 0;
-        while (p < end) {
-            if (*p == '{') ++depth;
-            else if (*p == '}') {
-                if (depth == 0) return;
-                --depth;
-            }
-            ++p;
-            if (depth == 0 && p < end && (*p == ';' || *p == ',')) {
-                // keep going inside lists
-            }
-        }
-    }
-
     void skipBlock() {
         skip();
         if (!consume('{')) return;
@@ -123,31 +108,16 @@ struct Tok {
     }
 };
 
-Mat4 identity() {
-    return {};
-}
-
 void applyConvert(Document& doc, const ConvertOptions& opt) {
     if (!opt.flipZ && !opt.flipWinding) return;
-
     auto flipV = [&](Vec3& v) {
         if (opt.flipZ) v.z = -v.z;
     };
     auto flipM = [&](Mat4& m) {
         if (!opt.flipZ) return;
-        // translation z
-        m.m[11] = -m.m[11]; // row-major index 2,3 -> 2*4+3 = 11 if row-major [row*4+col]
-        // also flip basis z row/col roughly: negate m20,m21,m22 and m02,m12 wait
-        // Frame matrices in .x are row-major 4x4. Translation is last row in DirectX text often:
-        //   _11 _12 _13 _14
-        //   _21 _22 _23 _24
-        //   _31 _32 _33 _34
-        //   _41 _42 _43 _44
-        // D3D uses _41,_42,_43 as translation. That's indices 12,13,14.
         m.m[14] = -m.m[14];
-        m.m[11] = -m.m[11]; // keep both common layouts safe-ish
+        m.m[11] = -m.m[11];
     };
-
     for (auto& mesh : doc.meshes) {
         for (auto& p : mesh.positions) flipV(p);
         for (auto& n : mesh.normals) flipV(n);
@@ -172,7 +142,6 @@ bool parseMaterialBody(Tok& t, Material& mat) {
     t.number(mat.emissive.r);
     t.number(mat.emissive.g);
     t.number(mat.emissive.b);
-
     while (!t.done() && *t.p != '}') {
         if (t.matchIdent("TextureFilename")) {
             t.consume('{');
@@ -202,13 +171,11 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
         t.number(mesh.positions[i].y);
         t.number(mesh.positions[i].z);
     }
-
     int nfaces = 0;
     if (!t.integer(nfaces) || nfaces < 0) return false;
     mesh.faceCountRaw = nfaces;
     mesh.indices.clear();
     mesh.materialOfFace.assign(static_cast<size_t>(nfaces), 0);
-
     for (int f = 0; f < nfaces; ++f) {
         int nidx = 0;
         t.integer(nidx);
@@ -226,11 +193,9 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             mesh.materialOfTri.push_back(0);
         }
     }
-
     while (!t.done() && *t.p != '}') {
         t.skip();
         if (t.p >= t.end || *t.p == '}') break;
-
         if (t.matchIdent("MeshNormals")) {
             t.consume('{');
             int nn = 0;
@@ -254,7 +219,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             t.consume('}');
             continue;
         }
-
         if (t.matchIdent("MeshTextureCoords")) {
             t.consume('{');
             int nu = 0;
@@ -267,7 +231,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             t.consume('}');
             continue;
         }
-
         if (t.matchIdent("MeshMaterialList")) {
             t.consume('{');
             int nmat = 0, nfaceMat = 0;
@@ -276,14 +239,10 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             std::vector<int> faceMat(static_cast<size_t>(std::max(nfaceMat, 0)), 0);
             for (int i = 0; i < nfaceMat; ++i) t.integer(faceMat[i]);
             mesh.materialOfFace = faceMat;
-
-            // remap tris roughly if counts match raw faces
             if (!mesh.materialOfTri.empty() && !faceMat.empty()) {
-                // already expanded; assign first material if mismatch
                 for (size_t i = 0; i < mesh.materialOfTri.size(); ++i)
                     mesh.materialOfTri[i] = faceMat[std::min(i, faceMat.size() - 1)];
             }
-
             while (!t.done() && *t.p != '}') {
                 if (t.matchIdent("Material")) {
                     Material mat;
@@ -293,7 +252,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
                     t.consume('}');
                     mesh.materials.push_back(mat);
                 } else if (t.consume('{')) {
-                    // named material reference
                     std::string ref = t.ident();
                     Material mat;
                     mat.name = ref;
@@ -308,7 +266,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             t.consume('}');
             continue;
         }
-
         if (t.matchIdent("XSkinMeshHeader")) {
             t.consume('{');
             t.integer(mesh.maxWeightsPerVertex);
@@ -318,7 +275,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             t.consume('}');
             continue;
         }
-
         if (t.matchIdent("SkinWeights")) {
             t.consume('{');
             SkinInfluence inf;
@@ -334,8 +290,6 @@ bool parseMeshBody(Tok& t, Mesh& mesh) {
             t.consume('}');
             continue;
         }
-
-        // unknown nested template
         std::string unk = t.ident();
         (void)unk;
         if (t.consume('{')) {
@@ -359,7 +313,6 @@ bool parseFrame(Tok& t, Document& doc, int parent) {
     t.consume('{');
     int self = static_cast<int>(doc.frames.size());
     doc.frames.push_back(fr);
-
     while (!t.done() && *t.p != '}') {
         if (t.matchIdent("FrameTransformMatrix")) {
             t.consume('{');
@@ -405,17 +358,12 @@ bool parseText(const std::string& text, Document& out, std::string& error, Conve
     Tok t;
     t.p = text.data();
     t.end = text.data() + text.size();
-
     t.skip();
-    if (text.size() >= 16 && text.compare(0, 3, "xof") == 0) {
+    if (text.size() >= 16 && text.compare(0, 3, "xof") == 0)
         out.header = text.substr(0, 16);
-    }
-
-    // skip header line
     if (t.matchIdent("xof")) {
         while (t.p < t.end && *t.p != '\n') ++t.p;
     }
-
     while (!t.done()) {
         if (t.matchIdent("template")) {
             t.ident();
@@ -447,7 +395,6 @@ bool parseText(const std::string& text, Document& out, std::string& error, Conve
             out.looseMaterials.push_back(mat);
             continue;
         }
-        // skip other top-level templates (AnimationSet, Header, ...)
         std::string id = t.ident();
         if (id.empty()) {
             if (!t.done()) ++t.p;
@@ -455,7 +402,6 @@ bool parseText(const std::string& text, Document& out, std::string& error, Conve
         }
         t.skipBlock();
     }
-
     applyConvert(out, opt);
     return true;
 }
@@ -466,19 +412,12 @@ bool parseBytes(const void* data, size_t size, Document& out, std::string& error
         return false;
     }
     const char* c = static_cast<const char*>(data);
-    std::string magic(c, c + 12);
-    if (magic.rfind("xof ", 0) != 0) {
+    if (std::string(c, 4) != "xof ") {
         error = "not an .x file";
         return false;
     }
-    bool bin = size >= 16 && (std::string(c + 8, 3) == "bin");
-    if (bin) {
-        out = {};
-        out.binary = true;
-        out.header.assign(c, c + std::min<size_t>(size, 16));
-        error = "binary .x not implemented yet";
-        return false;
-    }
+    const bool bin = size >= 16 && std::string(c + 8, 3) == "bin";
+    if (bin) return parseBinary(data, size, out, error, opt);
     return parseText(std::string(c, c + size), out, error, opt);
 }
 
