@@ -7,3 +7,4 @@
 #include "gdx/DDS.h"
 #include "gdx/DatLevel.h"
 #include "gdx/ElementCatalog.h"
+#include "gdx/Xpk.h"

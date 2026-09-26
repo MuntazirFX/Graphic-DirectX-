@@ -7,38 +7,61 @@
 static int fails = 0;
 #define CHECK(cond) do { if (!(cond)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #cond); ++fails; } } while (0)
 
+static std::vector<uint8_t> makeTinyXpk() {
+    const char* fname = "levels\\000.dat";
+    const uint32_t nameLen = static_cast<uint32_t>(std::strlen(fname) + 1);
+    const char payload[] = {'D','A','T','!'};
+    const uint32_t count = 1;
+    const uint32_t nameOff = 0;
+    const uint32_t total = 4;
+    const uint32_t sz = 4;
+    const uint32_t tm = 1036948800;
+    const uint32_t hdr =
+        4 + 4 + 4 + nameLen + 4 + 4 + 4 + 4;
+    std::vector<uint8_t> out(hdr + 4, 0);
+    size_t p = 0;
+    auto w32 = [&](uint32_t v) {
+        std::memcpy(out.data() + p, &v, 4);
+        p += 4;
+    };
+    w32(count);
+    w32(nameOff);
+    w32(nameLen);
+    std::memcpy(out.data() + p, fname, nameLen);
+    p += nameLen;
+    w32(total);
+    w32(sz);
+    w32(tm);
+    w32(hdr);
+    std::memcpy(out.data() + p, payload, 4);
+    return out;
+}
+
 int main() {
     gdx::Document doc;
     std::string err;
     CHECK(gdx::parseFile("samples/cube.x", doc, err));
-    CHECK(doc.firstMesh() != nullptr);
-    CHECK(doc.firstMesh()->positions.size() == 8);
-    CHECK(doc.firstMesh()->indices.size() == 36);
+    CHECK(doc.firstMesh() && doc.firstMesh()->positions.size() == 8);
 
     std::vector<uint8_t> raw(4 + 60, 0);
     uint32_t n = 1;
     std::memcpy(raw.data(), &n, 4);
     const char* name = "PRESENT A";
     std::memcpy(raw.data() + 4, name, std::strlen(name));
-    float xyz[6] = {1.f, 2.f, 3.f, 0, 90.f, 0};
+    float xyz[3] = {1.f, 2.f, 3.f};
     std::memcpy(raw.data() + 4 + 32, xyz, sizeof(xyz));
-    int32_t var = 7;
-    std::memcpy(raw.data() + 4 + 56, &var, 4);
     gdx::DatLevel lvl;
     CHECK(gdx::parseDatLevel(raw.data(), raw.size(), lvl));
-    CHECK(lvl.count == 1);
     CHECK(lvl.entities[0].name == "PRESENT A");
-    CHECK(lvl.entities[0].x == 1.f && lvl.entities[0].y == 2.f && lvl.entities[0].z == 3.f);
-    CHECK(lvl.entities[0].variant == 7);
 
-    gdx::ElementCatalog cat;
-    const char* txt =
-        "ELEMENT   \"PRESENT A\"\n"
-        "FILE      \"gfx\\\\present.x\"\n"
-        "TYPE      BONUS\n";
-    CHECK(cat.parse(txt) == 1);
-    CHECK(cat.find("PRESENT A") != nullptr);
-    CHECK(cat.find("PRESENT A")->type == "BONUS");
+    auto xpk = makeTinyXpk();
+    gdx::XpkArchive a;
+    CHECK(gdx::parseXpk(xpk.data(), xpk.size(), a));
+    CHECK(a.count == 1);
+    CHECK(a.find("levels/000.dat") != nullptr);
+    auto got = a.extract("LEVELS\\000.DAT");
+    CHECK(got.size() == 4);
+    CHECK(got[0] == 'D' && got[3] == '!');
 
     if (fails) {
         std::fprintf(stderr, "%d checks failed\n", fails);

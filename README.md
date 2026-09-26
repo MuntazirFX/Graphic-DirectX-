@@ -1,23 +1,21 @@
 # Graphic-DirectX-
 
-Portable Joymania / SCIT 2002 asset toolkit: DirectX `.x`, DDS header, custom level `.dat`, `elements.txt`.
+Joymania / Santa Claus in Trouble 2002 asset toolkit.
 
 https://github.com/MuntazirFX/Graphic-DirectX-
 
 ## Done
 
-- Text + binary `.x`
-- Frames, skin pack, animation keys
-- DDS header probe
-- **Level `.dat`**: `uint32 count` + 60-byte records (`name[32]`, xyz, rot, variant)
-- **elements.txt** catalog → PLATTFORM / ENEMY / DECO / BONUS / EXIT …
-- `xdump`, `datdump`, `gdx_tests`, GitHub Actions CI
+- DirectX `.x` text + binary
+- Level `.dat` (60-byte records)
+- `elements.txt` catalog
+- **XPK** (`xmas.xpk`): count, name table, sizes, timestamps, absolute data offsets
+- DDS header, skin pack
+- `xdump` `datdump` `xpkdump` + CI
 
-## Level .dat
+SCIT 2002 `xmas.xpk` stores file bytes raw (no per-file MSZip). Name "MSZip" is the family label; this reader matches the on-disk layout verified in `Santa-ios` / XPKTool.
 
 ```bash
-cmake -S . -B build && cmake --build build
-./build/datdump path/to/000.dat samples/elements.txt
+./build/xpkdump xmas.xpk
+./build/xpkdump xmas.xpk levels\\000.dat
 ```
-
-Use original files from XPK (`levels\\000.dat`). Do not invent new level layouts unless testing.
