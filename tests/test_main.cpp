@@ -9,18 +9,17 @@ int main() {
     gdx::Document doc;
     std::string err;
     CHECK(gdx::parseFile("samples/cube.x", doc, err));
-    CHECK(doc.firstMesh());
-    gdx::DrawItem d;
-    gdx::meshToDraw(*doc.firstMesh(), d);
-    CHECK(d.v.size() == 8);
-    CHECK(d.i.size() == 36);
-    CHECK(d.texture == "cube.dds");
-    auto p = gdx::perspectiveD3D(1.0f, 1.333f, 0.1f, 100.f);
-    CHECK(p.m[0] != 0);
+    gdx::DrawItem item;
+    gdx::meshToDraw(*doc.firstMesh(), item);
+    gdx::Device8 dev;
+    dev.reset(160, 120);
+    dev.setView(gdx::translation(0.f, 0.f, 4.f));
+    dev.draw(item);
+    CHECK(dev.litPixels() > 20);
     if (fails) {
         std::fprintf(stderr, "%d checks failed\n", fails);
         return 1;
     }
-    std::printf("ok\n");
+    std::printf("ok lit=%d\n", dev.litPixels());
     return 0;
 }

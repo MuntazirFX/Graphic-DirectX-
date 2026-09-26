@@ -17,5 +17,7 @@ jobs:
         run: cmake --build build --config Release
       - name: Dump sample
         run: ./build/xdump samples/cube.x
+      - name: Raster cube
+        run: ./build/d3d8dump samples/cube.x cube.ppm
       - name: Unit tests
         run: ./build/gdx_tests

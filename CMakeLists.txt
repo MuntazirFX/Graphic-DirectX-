@@ -12,6 +12,7 @@ add_library(gdx STATIC
     src/Xpk.cpp
     src/Game.cpp
     src/Title.cpp
+    src/D3D8Device.cpp
 )
 target_include_directories(gdx PUBLIC include)
 
@@ -21,6 +22,8 @@ add_executable(datdump src/datdump.cpp)
 target_link_libraries(datdump PRIVATE gdx)
 add_executable(xpkdump src/xpkdump.cpp)
 target_link_libraries(xpkdump PRIVATE gdx)
+add_executable(d3d8dump src/d3d8dump.cpp)
+target_link_libraries(d3d8dump PRIVATE gdx)
 
 add_executable(gdx_tests tests/test_main.cpp)
 target_link_libraries(gdx_tests PRIVATE gdx)
