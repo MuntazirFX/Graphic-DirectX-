@@ -351,6 +351,77 @@ bool parseFrame(Tok& t, Document& doc, int parent) {
     return true;
 }
 
+void parseAnimationSet(Tok& t, Document& doc) {
+    AnimationSet set;
+    set.name = t.ident();
+    t.consume('{');
+    while (!t.done() && *t.p != '}') {
+        if (t.matchIdent("Animation")) {
+            AnimTrack track;
+            track.frameName = t.ident();
+            t.consume('{');
+            while (!t.done() && *t.p != '}') {
+                if (t.matchIdent("AnimationKey")) {
+                    t.consume('{');
+                    int typ = 0, nkeys = 0;
+                    t.integer(typ);
+                    t.integer(nkeys);
+                    for (int k = 0; k < nkeys; ++k) {
+                        AnimKey key;
+                        key.type = static_cast<AnimKeyType>(typ);
+                        t.integer(key.time);
+                        int n = 0;
+                        t.integer(n);
+                        if (typ == 0 && n >= 4) {
+                            t.number(key.quat.w);
+                            t.number(key.quat.x);
+                            t.number(key.quat.y);
+                            t.number(key.quat.z);
+                            for (int e = 4; e < n; ++e) { float d; t.number(d); }
+                        } else if ((typ == 1 || typ == 2) && n >= 3) {
+                            t.number(key.vec.x);
+                            t.number(key.vec.y);
+                            t.number(key.vec.z);
+                            for (int e = 3; e < n; ++e) { float d; t.number(d); }
+                        } else if (n >= 16) {
+                            for (int e = 0; e < 16; ++e) t.number(key.matrix.m[e]);
+                            for (int e = 16; e < n; ++e) { float d; t.number(d); }
+                        } else {
+                            for (int e = 0; e < n; ++e) { float d; t.number(d); }
+                        }
+                        track.keys.push_back(key);
+                    }
+                    t.consume('}');
+                } else if (t.consume('{')) {
+                    track.frameName = t.ident();
+                    t.consume('}');
+                } else {
+                    std::string u = t.ident();
+                    (void)u;
+                    if (t.consume('{')) {
+                        int depth = 1;
+                        while (t.p < t.end && depth) {
+                            if (*t.p == '{') ++depth;
+                            else if (*t.p == '}') --depth;
+                            ++t.p;
+                        }
+                    } else if (!t.done() && *t.p != '}') {
+                        ++t.p;
+                    }
+                }
+            }
+            t.consume('}');
+            set.tracks.push_back(std::move(track));
+        } else {
+            std::string u = t.ident();
+            (void)u;
+            t.skipBlock();
+        }
+    }
+    t.consume('}');
+    doc.animations.push_back(std::move(set));
+}
+
 } // namespace
 
 bool parseText(const std::string& text, Document& out, std::string& error, ConvertOptions opt) {
@@ -393,6 +464,10 @@ bool parseText(const std::string& text, Document& out, std::string& error, Conve
             parseMaterialBody(t, mat);
             t.consume('}');
             out.looseMaterials.push_back(mat);
+            continue;
+        }
+        if (t.matchIdent("AnimationSet")) {
+            parseAnimationSet(t, out);
             continue;
         }
         std::string id = t.ident();
