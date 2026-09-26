@@ -1,29 +1,28 @@
 # Graphic-DirectX-
 
-Portable **DirectX `.x`** loader (no D3DX, no Windows SDK).
-For Santa Claus in Trouble 2002 iOS remake: parse original mesh / frame / skin files from XPK.
+Portable DirectX `.x` + DDS header toolkit for the Santa Claus in Trouble 2002 iOS remake.
+No Windows SDK. No D3DX.
 
-Repo: https://github.com/MuntazirFX/Graphic-DirectX-
+https://github.com/MuntazirFX/Graphic-DirectX-
 
-## Status
+## Features
 
-- Text `.x` (`xof 0302txt` / `0303txt`)
-- Binary `.x` (`xof 0302bin` / `0303bin`, 32- or 64-bit floats)
-- `Mesh`, `MeshNormals`, `MeshTextureCoords`, `MeshMaterialList`, `Material`, `TextureFilename`
-- `Frame` + `FrameTransformMatrix`
-- `XSkinMeshHeader` + `SkinWeights`
-- n-gon fan triangulation
-- Optional D3D → Metal (`ConvertOptions::metalFromD3D()`)
+- Text and binary `.x` (0302 / 0303, float32 / float64)
+- Mesh, normals, UVs, materials, texture names
+- Frame hierarchy + bind matrices
+- SkinWeights → packed 4-bone weights (`XSkin.h`)
+- AnimationSet / AnimationKey (text; binary best-effort)
+- DDS header probe (`DDS.h`)
+- D3D → Metal axis option
+- `xdump` CLI + `gdx_tests`
+- GitHub Actions CI
 
-Animation keys still skipped.
+This is **not** a Direct3D 9/11/12 runtime. It loads Joymania-era `.x` / DDS assets so a Metal engine can draw them.
 
 ## Build
 
 ```bash
-cmake -S . -B build
-cmake --build build
+cmake -S . -B build && cmake --build build
 ./build/xdump samples/cube.x
-./build/xdump path/to/extracted.x
+./build/gdx_tests
 ```
-
-`xdump` prints verts / tris / bones / textures. Use that on a real SCIT model next.

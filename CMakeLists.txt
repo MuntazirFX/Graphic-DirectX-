@@ -12,3 +12,10 @@ target_include_directories(gdx PUBLIC include)
 
 add_executable(xdump src/xdump.cpp)
 target_link_libraries(xdump PRIVATE gdx)
+
+add_executable(gdx_tests tests/test_main.cpp)
+target_link_libraries(gdx_tests PRIVATE gdx)
+add_custom_command(TARGET gdx_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/samples
+            ${CMAKE_BINARY_DIR}/samples)

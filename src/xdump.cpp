@@ -1,4 +1,4 @@
-#include "gdx/XParser.h"
+#include "gdx/gdx.h"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -13,8 +13,10 @@ int main(int argc, char** argv) {
         return 2;
     }
     std::cout << "header: " << doc.header << "\n";
+    std::cout << "binary: " << (doc.binary ? "yes" : "no") << "\n";
     std::cout << "frames: " << doc.frames.size() << "\n";
     std::cout << "meshes: " << doc.meshes.size() << "\n";
+    std::cout << "anims:  " << doc.animations.size() << "\n";
     for (const auto& m : doc.meshes) {
         std::cout << "  mesh '" << m.name << "' verts=" << m.positions.size()
                   << " tris=" << m.indices.size() / 3
@@ -27,5 +29,7 @@ int main(int argc, char** argv) {
         for (const auto& mat : m.materials)
             std::cout << "    mat " << mat.name << " tex=" << mat.texture << "\n";
     }
+    for (const auto& a : doc.animations)
+        std::cout << "  anim '" << a.name << "' tracks=" << a.tracks.size() << "\n";
     return 0;
 }
